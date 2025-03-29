@@ -38,5 +38,5 @@ I believe in **clean code, agile practices**, and solutions that balance perform
 ---
 
 ## 🌍 Let’s Connect  
-- [LinkedIn](www.linkedin.com/in/alejandro-bogado)  
+- [LinkedIn](https://www.linkedin.com/in/alejandro-bogado/)  
 - **Email**: bogado29@gmail.com  
