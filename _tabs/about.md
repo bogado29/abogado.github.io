@@ -8,7 +8,7 @@ order: 4
 
 ### 🚀 Senior Siebel Consultant | Full-Stack CRM Developer  
 
-With **8+ years of experience** in enterprise software development, I specialize in **Siebel CRM customization** and scalable backend solutions. My expertise spans from **eScript** and **JSP** to modern web technologies like **React** and **Golang**, ensuring robust and user-centric systems.  
+Hi !, here Alejandro Bogado, with **8+ years of experience** in enterprise software development, I specialize in **Siebel CRM customization** and scalable backend solutions. My expertise spans from **eScript** and **JSP** to modern web technologies like **React** and **Golang**, ensuring robust and user-centric systems.  
 
 ---
 
