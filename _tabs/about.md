@@ -15,7 +15,7 @@ Hi !, here Alejandro Bogado, with **8+ years of experience** in enterprise softw
 ## 🔧 Technical Expertise  
 
 ### **CRM & Backend Development**  
-- **Siebel eCommunications**: Customization of Applets, BO/BC, Web Templates (PM/PR), and eScript.  
+- **Siebel**: Advanced customizations across several modules.  
 - **Full-Stack Integration**: Vanilla JavaScript, HTML/CSS, JSP, and microservices (Golang/Java).  
 - **Cloud & DevOps**: AWS (ECS), CI/CD pipelines, and monitoring (Datadog/Kibana).  
 
