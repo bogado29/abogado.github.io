@@ -12,7 +12,7 @@ Use our interactive tool to create custom Siebel Open UI components:
 
 
 <div class="text-center">
-   <a href="_includes/PR-PM-Generator.html" 
+   <a href="/assets/generators/PR-PM-Generator.html" 
       target="_blank"
       class="btn btn-lg btn-primary">
       🛠️ Open Generator Tool
