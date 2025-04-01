@@ -1,6 +1,6 @@
 ---
 title: Where to Find EncodedArgs in Siebel Logs - A Developer's Guide
-date: 2025-03-30 09:00:00 +1300
+date: 2025-04-01 09:00:00 +1300
 categories: [Siebel, Troubleshooting]
 tags: [siebel, encodedargs, workflow, logs, diagnostics, wfprocmgr]
 author: Alejandro Bogado
@@ -39,7 +39,7 @@ Input: @0*1*5*0*0*0*8*RefCount1*37*EventId8*1-7E3JSN9*Sub Event0*25*RTESupressIn
 ```
 
 ### Key Observations:
-   - The structure begins with @0*1*5*0*...
+   - The structure begins with something similar to "@ 0 * 1 * 5 * 0 * ..."
    -  Parameters are encoded in [Length]*[Name][ValueLength]*[Value] format
 
 ## 🛠️ How to Extract EncodedArgs
@@ -48,6 +48,8 @@ Enable Detailed Logging:
 ```bash
 srvrmgr> change param LogLevel=4 for comp WfProcMgr
 ```
+
+Review the logs generated afther workflow execution. 
 
 ### 💬 Let's Discuss!
 
