@@ -27,7 +27,7 @@ You'll typically find EncodedArgs in these log sources:
 
 Here's a real log snippet showing EncodedArgs in action:
 
-```log
+```
 ObjMgrBusServiceLog  InvokeMethod  4  000041e867c20293:0  2025-03-11 16:29:05  
 Begin: Business Service 'Workflow Process Manager' invoke method: '_HandleSpecialEvent' at 1c1b00c0
 
