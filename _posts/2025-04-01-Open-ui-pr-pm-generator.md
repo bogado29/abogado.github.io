@@ -6,20 +6,10 @@ tags: [siebel, pr, pm, openui]
 author: Alejandro Bogado
 ---
 
-## Generate PR/PM/CR Templates
-
 Use our interactive tool to create custom Siebel Open UI components:
 
 
-<div class="text-center">
-   <a href="/PR-PM-Generator.html" 
-      target="_blank"
-      class="btn btn-lg btn-primary">
-      🛠️ Open Generator Tool
-   </a>
-   
-   <small class="text-muted">(Opens in new window)</small>
-</div>
+[Abrir Generador](./PR-PM-Generator.html)
 
 ### Features:
 - Pre-configured templates
