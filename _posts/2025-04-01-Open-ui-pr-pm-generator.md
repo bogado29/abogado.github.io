@@ -9,8 +9,6 @@ author: Alejandro Bogado
 Use our interactive tool to create custom Siebel Open UI components:
 
 
-[Abrir Generador](./PR-PM-Generator.html)
-
 ### Features:
 - Pre-configured templates
 - Copy-ready code
