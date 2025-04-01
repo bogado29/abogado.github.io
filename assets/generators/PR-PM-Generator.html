@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siebel Open UI PR/PM/CR Generator</title>
+
+    <!-- CDN Links -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        :root {
+            /* Light Theme */
+            --bg-color: #f9f9f9;
+            --text-color: #333;
+            --primary-color: #337ab7;
+            --danger-color: #d9534f;
+            --info-color: #5bc0de;
+            --success-color: #5cb85c;
+            --card-bg: #ffffff;
+            --border-color: #ddd;
+            --code-bg: #f8f9fa;
+            --input-bg: #ffffff;
+            --input-text: #333;
+        }
+
+        .dark-mode {
+            /* Dark Theme */
+            --bg-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --primary-color: #569cd6;
+            --danger-color: #f48771;
+            --info-color: #4fc1ff;
+            --success-color: #73c990;
+            --card-bg: #252526;
+            --border-color: #444;
+            --code-bg: #2d2d2d;
+            --input-bg: #333;
+            --input-text: #e0e0e0;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1,
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .code-container {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: var(--card-bg);
+            position: relative;
+            padding-bottom: 60px;
+        }
+
+        .CodeMirror {
+            height: auto;
+            border-radius: 4px 4px 0 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: var(--code-bg) !important;
+            margin-bottom: 0;
+        }
+
+        .bs-callout {
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid var(--border-color);
+            border-radius: 3px;
+            background: var(--card-bg);
+        }
+
+        .bs-callout-info {
+            border-left-color: var(--info-color);
+        }
+
+        .bs-callout-danger {
+            border-left-color: var(--danger-color);
+        }
+
+        .bs-callout-success {
+            border-left-color: var(--success-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .nav-links {
+            margin-bottom: 20px;
+        }
+
+        .nav-links a {
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .copy-btn-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            border-radius: 0 0 4px 4px;
+            text-align: center;
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .tooltip {
+            font-size: 1.1em;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            height: 50px;
+        }
+
+        .form-control,
+        .form-control:focus {
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            border-color: var(--border-color);
+        }
+
+        .checkbox label,
+        .radio label {
+            color: var(--text-color);
+        }
+
+        .text-muted {
+            color: #aaa !important;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .author-section {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .author-section h4 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        .author-field {
+            margin-bottom: 10px;
+        }
+
+        .author-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .author-field input {
+            width: 100%;
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--input-bg);
+            color: var(--input-text);
+        }
+    </style>
+</head>
+
+<body class="dark-mode">
+    <div class="container">
+        <div class="header-section">
+            <div>
+                <h1><i class="fas fa-code"></i> Open UI PR/PM/CR Generator</h1>
+                <p class="lead">Generate custom Siebel Open UI code templates</p>
+            </div>
+            <img src="assets/img/svg/oracle_siebel.svg" alt="Siebel Logo" class="logo">
+        </div>
+
+        <div class="bs-callout bs-callout-danger">
+            <i class="fas fa-exclamation-triangle"></i> For best results, use a modern browser like Chrome, Firefox, or
+            Edge.
+        </div>
+
+        <h2><i class="fas fa-cogs"></i> Template Configuration</h2>
+
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label for="PRPM" class="col-sm-2 control-label">
+                    <abbr title="Physical Renderer or Presentation Model or Context Renderer">
+                        <i class="fas fa-question-circle"></i> PR/PM/CR
+                    </abbr>
+                </label>
+                <div class="col-sm-8">
+                    <select class="form-control" id="PRPM">
+                        <option value="PR">Physical Renderer (PR)</option>
+                        <option value="PM">Presentation Model (PM)</option>
+                        <option value="CR">Context Renderer (CR)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" id="objectTypeGroup">
+                <label for="Object" class="col-sm-2 control-label"><i class="fas fa-object-group"></i> Type</label>
+                <div class="col-sm-8">
+                    <select class="form-control" id="Object">
+                        <option value="DesktopForm">Desktop Form Applet</option>
+                        <option value="DesktopList">Desktop List Applet</option>
+                        <option value="DesktopTree">Desktop Tree Applet</option>
+                        <option value="MobileList">Mobile List Applet</option>
+                        <option value="MobileForm">Mobile Form Applet</option>
+                        <option value="View">View</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Namer" class="col-sm-2 control-label"><i class="fas fa-tag"></i> Name</label>
+                <div class="col-sm-8">
+                    <input id="Namer" class="form-control" value="CustomRenderer" placeholder="Enter component name" />
+                    <small class="text-muted">This will be used as the class name (e.g., CustomRendererPR)</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label"><i class="fas fa-comment"></i> Options</label>
+                <div class="col-sm-8">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="Comments" checked> Include comments
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="Logging"> Include logging
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="IncludeHeader" checked> Include file header
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="UserProps" class="col-sm-2 control-label">
+                    <i class="fas fa-list"></i> User Properties
+                </label>
+                <div class="col-sm-8">
+                    <input id="UserProps" class="form-control" placeholder="property1,property2,property3" />
+                    <small class="text-muted">Comma-separated list of user properties to process</small>
+                </div>
+            </div>
+        </form>
+
+        <div class="author-section">
+            <h4><i class="fas fa-user-edit"></i> File Header Information</h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="author-field">
+                        <label for="AuthorName">Author Name</label>
+                        <input type="text" id="AuthorName" placeholder="Your Name">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="author-field">
+                        <label for="Company">Company</label>
+                        <input type="text" id="Company" placeholder="Your Company">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="author-field">
+                        <label for="Purpose">Purpose</label>
+                        <input type="text" id="Purpose" placeholder="Component purpose">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bs-callout bs-callout-info" id="instruction">
+            <i class="fas fa-info-circle"></i> Configure your template above and the code will generate automatically.
+        </div>
+
+        <div class="bs-callout bs-callout-success" id="filename-display">
+            <i class="fas fa-file-code"></i> File: <code id="filename">CustomRendererPR.js</code>
+        </div>
+
+        <div class="code-container">
+            <div id="code" class="code"></div>
+            <div class="copy-btn-container">
+                <button id="copy-btn" class="btn btn-primary copy-btn" title="Copy to clipboard">
+                    <i class="fas fa-copy"></i> COPY TO CLIPBOARD
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+    <script>
+        // Configuration objects
+        const templateConfig = {
+            PR: {
+                View: { def: 'siebel/viewpr', ext: 'ViewPR' },
+                MobileList: { def: 'siebel/jqmlistrenderer', ext: 'JQMListRenderer' },
+                MobileForm: { def: 'siebel/jqmformrenderer', ext: 'JQMFormRenderer' },
+                DesktopList: { def: 'siebel/jqgridrenderer', ext: 'JQGridRenderer' },
+                DesktopTree: { def: 'siebel/treeappletphyrenderer', ext: 'TreeAppletPR' },
+                DesktopForm: { def: 'siebel/phyrenderer', ext: 'PhysicalRenderer' }
+            },
+            PM: {
+                View: { def: 'siebel/viewpm', ext: 'ViewPM' },
+                MobileList: { def: 'siebel/listpmodel', ext: 'ListPresentationModel' },
+                MobileForm: { def: 'siebel/pmodel', ext: 'PresentationModel' },
+                DesktopList: { def: 'siebel/listpmodel', ext: 'ListPresentationModel' },
+                DesktopTree: { def: 'siebel/explorerpmodel', ext: 'ExplorerPresentationModel' },
+                DesktopForm: { def: 'siebel/pmodel', ext: 'PresentationModel' }
+            },
+            CR: {
+                View: { def: 'siebel/basecr', ext: 'BaseCR' },
+                MobileList: { def: 'siebel/basecr', ext: 'BaseCR' },
+                MobileForm: { def: 'siebel/basecr', ext: 'BaseCR' },
+                DesktopList: { def: 'siebel/basecr', ext: 'BaseCR' },
+                DesktopTree: { def: 'siebel/basecr', ext: 'BaseCR' },
+                DesktopForm: { def: 'siebel/basecr', ext: 'BaseCR' }
+            }
+        };
+
+        // DOM Elements
+        const elements = {
+            PRPM: $('#PRPM'),
+            Object: $('#Object'),
+            Namer: $('#Namer'),
+            Comments: $('#Comments'),
+            Logging: $('#Logging'),
+            IncludeHeader: $('#IncludeHeader'),
+            UserProps: $('#UserProps'),
+            instruction: $('#instruction'),
+            filename: $('#filename'),
+            code: $('#code'),
+            objectTypeGroup: $('#objectTypeGroup'),
+            filenameDisplay: $('#filename-display'),
+            AuthorName: $('#AuthorName'),
+            Company: $('#Company'),
+            Purpose: $('#Purpose'),
+            themeToggle: $('#themeToggle')
+        };
+
+        // State
+        let codeMirrorInstance;
+        let isInitialized = false;
+        let isDarkMode = true;
+
+        // Initialize the application
+        function init() {
+            setupEventListeners();
+            initializeCodeMirror();
+            loadFromQueryParams();
+            generateCode();
+            isInitialized = true;
+
+            // Initialize clipboard.js
+            new ClipboardJS('#copy-btn', {
+                text: function () {
+                    return codeMirrorInstance.getValue();
+                }
+            });
+
+            // Show tooltip when copied
+            $('#copy-btn').tooltip({
+                trigger: 'click',
+                placement: 'top'
+            });
+
+            $('#copy-btn').on('shown.bs.tooltip', function () {
+                setTimeout(function () {
+                    $('#copy-btn').tooltip('hide');
+                }, 1000);
+            });
+
+            // Set default author info if empty
+            if (!elements.AuthorName.val()) {
+                elements.AuthorName.val('Your Name');
+            }
+            if (!elements.Company.val()) {
+                elements.Company.val('Your Company');
+            }
+            if (!elements.Purpose.val()) {
+                elements.Purpose.val('Custom Siebel Open UI component');
+            }
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            elements.PRPM.on('change', function () {
+                toggleObjectTypeVisibility();
+                generateCode();
+            });
+
+            elements.Object.on('change', generateCode);
+            elements.Namer.on('keyup', generateCode);
+            elements.UserProps.on('keyup', generateCode);
+            elements.Comments.on('change', generateCode);
+            elements.Logging.on('change', generateCode);
+            elements.IncludeHeader.on('change', generateCode);
+            elements.AuthorName.on('keyup', generateCode);
+            elements.Company.on('keyup', generateCode);
+            elements.Purpose.on('keyup', generateCode);
+            elements.themeToggle.on('click', toggleTheme);
+        }
+
+        // Toggle between light and dark theme
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+                $('body').addClass('dark-mode');
+                elements.themeToggle.html('<i class="fas fa-moon"></i>');
+                codeMirrorInstance.setOption('theme', 'dracula');
+            } else {
+                $('body').removeClass('dark-mode');
+                elements.themeToggle.html('<i class="fas fa-sun"></i>');
+                codeMirrorInstance.setOption('theme', 'default');
+            }
+        }
+
+        // Toggle visibility of object type dropdown based on PR/PM/CR selection
+        function toggleObjectTypeVisibility() {
+            const isCR = elements.PRPM.val() === 'CR';
+            elements.objectTypeGroup.toggle(!isCR);
+        }
+
+        // Initialize CodeMirror
+        function initializeCodeMirror() {
+            codeMirrorInstance = CodeMirror(elements.code[0], {
+                mode: 'javascript',
+                lineNumbers: true,
+                readOnly: true,
+                lineWrapping: true,
+                indentUnit: 4,
+                theme: 'dracula'
+            });
+        }
+
+        // Generate file header
+        function generateFileHeader() {
+            const today = moment().format('ddd MMM DD YYYY');
+            const author = elements.AuthorName.val() || 'Your Name';
+            const company = elements.Company.val() || 'Your Company';
+            const purpose = elements.Purpose.val() || 'Custom Siebel Open UI component';
+
+            let header = '/**********************************************************************\n';
+            header += `// Author\t\t: ${author}\n`;
+            header += `// Company\t\t: ${company}\n`;
+            header += `// Date\t\t\t: ${today}\n`;
+            header += `// Purpose\t\t: ${purpose}\n`;
+            header += '// \n';
+            header += '// Modification List\n';
+            header += '// Name\t\t\tDate\t\t\tModification\n';
+            header += '// --------------------------------------------------------------------\n';
+            header += '// \n';
+            header += '/**********************************************************************/\n\n';
+
+            return header;
+        }
+
+        // Generate the code based on current selections
+        function generateCode() {
+            const type = elements.PRPM.val();
+            const objectType = elements.Object.val();
+            const name = elements.Namer.val() || 'CustomRenderer';
+            const includeComments = elements.Comments.is(':checked');
+            const includeLogging = elements.Logging.is(':checked');
+            const includeHeader = elements.IncludeHeader.is(':checked');
+            const userProps = elements.UserProps.val().split(',').filter(prop => prop.trim());
+
+            // Generate filename
+            const filename = `${name}${type}.js`;
+            elements.filename.text(filename);
+
+            // Generate code based on type
+            let code = includeHeader ? generateFileHeader() : '';
+
+            switch (type) {
+                case 'PR':
+                    code += generatePRCode(name, objectType, includeComments, includeLogging, userProps);
+                    break;
+                case 'PM':
+                    code += generatePMCode(name, objectType, includeComments, includeLogging, userProps);
+                    break;
+                case 'CR':
+                    code += generateCRCode(name, includeComments, includeLogging);
+                    break;
+            }
+
+            // Update CodeMirror
+            codeMirrorInstance.setValue(code);
+
+            // Update instructions
+            updateInstructions(type, name, objectType, userProps);
+
+            // Update URL
+            if (isInitialized) {
+                updateURL(type, objectType, name, userProps, includeComments, includeLogging, includeHeader);
+            }
+        }
+
+        // Generate PR code
+        function generatePRCode(name, objectType, includeComments, includeLogging, userProps) {
+            const { def, ext } = templateConfig.PR[objectType];
+
+            let code = `if (typeof(SiebelAppFacade.${name}PR) === "undefined") {\n\n`;
+            code += ` SiebelJS.Namespace("SiebelAppFacade.${name}PR");\n`;
+            code += ` define("siebel/custom/${name}PR", ["${def}"],\n`;
+            code += `  function () {\n`;
+            code += `   SiebelAppFacade.${name}PR = (function () {\n\n`;
+            code += `    function ${name}PR(pm) {\n`;
+            code += `     SiebelAppFacade.${name}PR.superclass.constructor.apply(this, arguments);\n`;
+            code += `    }\n\n`;
+            code += `    SiebelJS.Extend(${name}PR, SiebelAppFacade.${ext});\n\n`;
+
+            // Init method
+            code += `    ${name}PR.prototype.Init = function () {\n`;
+            if (includeComments) code += `     // Init is called each time the object is initialised\n`;
+            if (includeComments) code += `     // Add code here that should happen before default processing\n`;
+            code += `     SiebelAppFacade.${name}PR.superclass.Init.apply(this, arguments);\n`;
+            if (includeLogging) code += `     SiebelJS.Log(this.GetPM().Get("GetName") + ": ${name}PR: Init method reached");\n`;
+            if (includeComments) code += `     // Add code here that should happen after default processing\n`;
+            code += `    }\n\n`;
+
+            // ShowUI method
+            code += `    ${name}PR.prototype.ShowUI = function () {\n`;
+            if (includeComments) code += `     // ShowUI is called when the object is initially laid out\n`;
+            if (includeComments) code += `     // Add code here that should happen before default processing\n`;
+            if (includeLogging) code += `     SiebelJS.Log(this.GetPM().Get("GetName") + ": ${name}PR: ShowUI method reached");\n`;
+            code += `     SiebelAppFacade.${name}PR.superclass.ShowUI.apply(this, arguments);\n`;
+            if (includeComments) code += `     // Add code here that should happen after default processing\n`;
+
+            // Add user property logging if needed
+            userProps.forEach(prop => {
+                if (prop.trim()) {
+                    if (includeLogging) {
+                        code += `     SiebelJS.Log(this.GetPM().Get("GetName") + ": ${name}PR: User Property ${prop} has value: " + this.GetPM().Get("${prop}"));\n`;
+                    }
+                }
+            });
+
+            code += `    }\n\n`;
+
+            // BindData method
+            code += `    ${name}PR.prototype.BindData = function (bRefresh) {\n`;
+            if (includeComments) code += `     // BindData is called each time the data set changes\n`;
+            if (includeComments) code += `     // This is where you'll bind data to UI elements created in ShowUI\n`;
+            if (includeComments) code += `     // Add code here that should happen before default processing\n`;
+            if (includeLogging) code += `     SiebelJS.Log(this.GetPM().Get("GetName") + ": ${name}PR: BindData method reached");\n`;
+            code += `     SiebelAppFacade.${name}PR.superclass.BindData.apply(this, arguments);\n`;
+            if (includeComments) code += `     // Add code here that should happen after default processing\n`;
+            code += `    }\n\n`;
+
+            // BindEvents method
+            code += `    ${name}PR.prototype.BindEvents = function () {\n`;
+            if (includeComments) code += `     // BindEvents is where we add UI event processing\n`;
+            if (includeComments) code += `     // Add code here that should happen before default processing\n`;
+            if (includeLogging) code += `     SiebelJS.Log(this.GetPM().Get("GetName") + ": ${name}PR: BindEvents method reached");\n`;
+            code += `     SiebelAppFacade.${name}PR.superclass.BindEvents.apply(this, arguments);\n`;
+            if (includeComments) code += `     // Add code here that should happen after default processing\n`;
+            code += `    }\n\n`;
+
+            // EndLife method
+            code += `    ${name}PR.prototype.EndLife = function () {\n`;
+            if (includeComments) code += `     // EndLife is where we perform any required cleanup\n`;
+            if (includeComments) code += `     // Add code here that should happen before default processing\n`;
+            if (includeLogging) code += `     SiebelJS.Log(this.GetPM().Get("GetName") + ": ${name}PR: EndLife method reached");\n`;
+            code += `     SiebelAppFacade.${name}PR.superclass.EndLife.apply(this, arguments);\n`;
+            if (includeComments) code += `     // Add code here that should happen after default processing\n`;
+            code += `    }\n\n`;
+
+            code += `    return ${name}PR;\n`;
+            code += `   }()\n`;
+            code += `  );\n`;
+            code += `  return "SiebelAppFacade.${name}PR";\n`;
+            code += ` })\n`;
+            code += `}\n`;
+
+            return code;
+        }
+
+        // Generate PM code
+        function generatePMCode(name, objectType, includeComments, includeLogging, userProps) {
+            const { def, ext } = templateConfig.PM[objectType];
+
+            let code = `if (typeof(SiebelAppFacade.${name}PM) === "undefined") {\n\n`;
+            code += ` SiebelJS.Namespace("SiebelAppFacade.${name}PM");\n`;
+            code += ` define("siebel/custom/${name}PM", ["${def}"],\n`;
+            code += `  function () {\n`;
+            code += `   SiebelAppFacade.${name}PM = (function () {\n`;
+
+            // Add dependencies if we have user properties
+            if (userProps.length > 0) {
+                code += `\n    var consts = SiebelJS.Dependency("SiebelApp.Constants");\n`;
+                code += `    var utils = SiebelJS.Dependency("SiebelApp.Utils");\n`;
+            }
+
+            code += `\n    function ${name}PM(pm) {\n`;
+            code += `     SiebelAppFacade.${name}PM.superclass.constructor.apply(this, arguments);\n`;
+            code += `    }\n\n`;
+            code += `    SiebelJS.Extend(${name}PM, SiebelAppFacade.${ext});\n\n`;
+
+            // Init method
+            code += `    ${name}PM.prototype.Init = function () {\n`;
+            if (includeComments) code += `     // Init is called each time the object is initialised\n`;
+            if (includeComments) code += `     // Add code here that should happen before default processing\n`;
+            code += `     SiebelAppFacade.${name}PM.superclass.Init.apply(this, arguments);\n`;
+            if (includeLogging) code += `     SiebelJS.Log(this.Get("GetName") + ": ${name}PM: Init method reached");\n`;
+            if (includeComments) code += `     // Add code here that should happen after default processing\n`;
+            code += `    }\n\n`;
+
+            // Setup method
+            code += `    ${name}PM.prototype.Setup = function (propSet) {\n`;
+            if (includeComments) code += `     // Setup is called each time the object is initialised\n`;
+            if (includeComments) code += `     // Add code here that should happen before default processing\n`;
+            if (includeLogging) code += `     SiebelJS.Log(this.Get("GetName") + ": ${name}PM: Setup method reached");\n`;
+            code += `     SiebelAppFacade.${name}PR.superclass.Setup.apply(this, arguments);\n`;
+            if (includeComments) code += `     // Add code here that should happen after default processing\n`;
+
+            // Add user property processing if needed
+            userProps.forEach(prop => {
+                if (prop.trim()) {
+                    code += `     processCustomUserProperty.call(this, propSet, "${prop}");\n`;
+                }
+            });
+
+            code += `    }\n`;
+
+            // Add user property processing function if needed
+            if (userProps.length > 0) {
+                code += `\n    function processCustomUserProperty(propSet, propertyName) {\n`;
+                if (objectType === "View") {
+                    code += `     var userProps = propSet.GetChildByType(consts.get("SWE_VIEW_PM_PS"));\n`;
+                } else {
+                    code += `     var userProps = propSet.GetChildByType(consts.get("SWE_APPLET_PM_PS"));\n`;
+                }
+                code += `     if (userProps) {\n`;
+                code += `      var propVal = userProps.GetProperty(propertyName);\n`;
+                code += `      if (!utils.IsEmpty(propVal)) {\n`;
+                code += `       this.AddProperty(propertyName, propVal);\n`;
+                if (includeLogging) {
+                    code += `       SiebelJS.Log(this.Get("GetName") + ": " + propertyName + " user property was retrieved with value " + propVal);\n`;
+                }
+                code += `      }\n`;
+                code += `     } else {\n`;
+                if (includeLogging) {
+                    code += `      SiebelJS.Log(this.Get("GetName") + ": Could not get the value of the " + propertyName + " user property");\n`;
+                }
+                code += `     }\n`;
+                code += `    }\n`;
+            }
+
+            code += `\n    return ${name}PM;\n`;
+            code += `   }()\n`;
+            code += `  );\n`;
+            code += `  return "SiebelAppFacade.${name}PM";\n`;
+            code += ` })\n`;
+            code += `}\n`;
+
+            return code;
+        }
+
+        // Generate CR code
+        function generateCRCode(name, includeComments, includeLogging) {
+            let code = `if (typeof(SiebelAppFacade.${name}CR) === "undefined") {\n\n`;
+            code += ` SiebelJS.Namespace("SiebelAppFacade.${name}CR");\n`;
+            code += ` define("siebel/custom/${name}CR", ["siebel/basecr"],\n`;
+            code += `  function () {\n`;
+            code += `   SiebelAppFacade.${name}CR = (function () {\n\n`;
+            code += `    function ${name}CR() {\n`;
+            code += `    }\n\n`;
+            code += `    SiebelJS.Extend(${name}CR, SiebelAppFacade.BaseCR);\n\n`;
+
+            // Init method
+            code += `    ${name}CR.prototype.Init = function (prContext) {\n`;
+            if (includeComments) code += `     // Init is called after the PR Init method\n`;
+            if (includeLogging) code += `     SiebelJS.Log(prContext.GetPM().Get("GetName") + ": ${name}CR: Init method reached");\n`;
+            code += `    }\n\n`;
+
+            // Execute method
+            code += `    ${name}CR.prototype.Execute = function (prContext) {\n`;
+            if (includeComments) code += `     // Execute is called after the PR BindData method\n`;
+            if (includeLogging) code += `     SiebelJS.Log(prContext.GetPM().Get("GetName") + ": ${name}CR: Execute method reached");\n`;
+            code += `    }\n\n`;
+
+            code += `    return ${name}CR;\n`;
+            code += `   }()\n`;
+            code += `  );\n`;
+            code += `  return SiebelAppFacade.${name}CR;\n`;
+            code += ` })\n`;
+            code += `}\n`;
+
+            return code;
+        }
+
+        // Update instructions based on current selections
+        function updateInstructions(type, name, objectType, userProps) {
+            let instructions = `Copy and save the code below in your custom folder as <code>${name}${type}.js</code>. `;
+            instructions += `Get the <strong>cASe</strong> right, it's important.`;
+
+            if (type === "CR") {
+                instructions += `<br/><mark><i class="fas fa-exclamation-circle"></i> NOTE</mark>: You must include the base PR file in the Manifest Administration with sequence 1.`;
+            }
+
+            if (userProps.length > 0 && type === "PR") {
+                instructions += `<br/><mark><i class="fas fa-exclamation-circle"></i> NOTE</mark>: To use custom user properties you will also need a custom PM.`;
+            }
+
+            if (objectType.match("Mobile")) {
+                instructions += `<br/><mark><i class="fas fa-exclamation-circle"></i> NOTE</mark>: Mobile types are no longer used in IP2014. Use Desktop types even for mobile work.`;
+            }
+
+            elements.instruction.html(instructions);
+        }
+
+        // Update URL with current state
+        function updateURL(type, objectType, name, userProps, includeComments, includeLogging, includeHeader) {
+            const params = new URLSearchParams();
+            params.set('prpm', type);
+            params.set('object', objectType);
+            params.set('name', name);
+            params.set('userprops', userProps.join(','));
+            params.set('comments', includeComments ? 'Yes' : 'No');
+            params.set('logging', includeLogging ? 'Yes' : 'No');
+            params.set('header', includeHeader ? 'Yes' : 'No');
+
+            window.history.replaceState({}, document.title, '?' + params.toString());
+        }
+
+        // Load parameters from URL
+        function loadFromQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+
+            if (params.has('prpm')) {
+                elements.PRPM.val(params.get('prpm'));
+                toggleObjectTypeVisibility();
+            }
+
+            if (params.has('object')) {
+                elements.Object.val(params.get('object'));
+            }
+
+            if (params.has('name')) {
+                elements.Namer.val(params.get('name'));
+            }
+
+            if (params.has('userprops')) {
+                elements.UserProps.val(params.get('userprops'));
+            }
+
+            if (params.has('comments')) {
+                elements.Comments.prop('checked', params.get('comments') === 'Yes');
+            }
+
+            if (params.has('logging')) {
+                elements.Logging.prop('checked', params.get('logging') === 'Yes');
+            }
+
+            if (params.has('header')) {
+                elements.IncludeHeader.prop('checked', params.get('header') === 'Yes');
+            }
+        }
+
+        // Initialize the application when DOM is ready
+        $(document).ready(init);
+    </script>
+</body>
+
+</html>
